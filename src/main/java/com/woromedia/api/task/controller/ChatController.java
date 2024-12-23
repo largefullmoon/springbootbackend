@@ -13,6 +13,9 @@ import com.woromedia.api.task.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -91,6 +94,16 @@ public class ChatController {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Failed to upload file");
         }
+    }
+
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages")
+    public MessageDto handleMessage(@Payload MessageDto messageDto) {
+        System.out.println("Received message through WebSocket: " + messageDto.getMessage());
+        Message message = new Message(messageDto.getMessage(), messageDto.getSenderId(), messageDto.getReceiverId(),
+                messageDto.getTime(), messageDto.getFileName(), false);
+        messageRepository.save(message);
+        return messageDto;
     }
 
     @PostMapping("/messages")
