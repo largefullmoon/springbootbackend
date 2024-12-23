@@ -26,18 +26,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        // Remove any channel interceptors that might be doing authentication
-        registration.interceptors();
-    }
-
-    @Override
-    public void configureClientOutboundChannel(ChannelRegistration registration) {
-        // Remove any channel interceptors that might be doing authentication
-        registration.interceptors();
-    }
-
-    @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.setMessageSizeLimit(128 * 1024);
         registration.setSendBufferSizeLimit(512 * 1024);
