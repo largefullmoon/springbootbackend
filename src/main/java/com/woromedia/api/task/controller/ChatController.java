@@ -110,13 +110,14 @@ public class ChatController {
     @PostMapping("/messages")
     public ResponseEntity<?> sendMessage(@RequestBody MessageDto messageDto) {
         // Access values using getters
+        LocalDateTime serverTime = LocalDateTime.now();
         System.out.println("Message: " + messageDto.getMessage());
         System.out.println("Sender ID: " + messageDto.getSenderId());
         System.out.println("Receiver ID: " + messageDto.getReceiverId());
-        System.out.println("Time: " + messageDto.getTime());
+        System.out.println("Time: " + serverTime);
         System.out.println("FileName: " + messageDto.getFileName());
         Message message = new Message(messageDto.getMessage(), messageDto.getSenderId(), messageDto.getReceiverId(),
-                messageDto.getTime(), messageDto.getFileName(), false);
+                serverTime, messageDto.getFileName(), false);
         messageRepository.save(message);
         // Emit socket event to the frontend
         messagingTemplate.convertAndSend("/topic/messages", messageDto);
