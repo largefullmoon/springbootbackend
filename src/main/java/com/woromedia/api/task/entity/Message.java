@@ -3,8 +3,13 @@ package com.woromedia.api.task.entity;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
-import javax.persistence.*;
+import java.time.ZonedDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Data
 @Entity
@@ -18,7 +23,9 @@ public class Message {
     private Long senderId;
     private String message;
     private String filename;
-    private LocalDateTime time;
+    
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime time;  // Keep as LocalDateTime for database compatibility
     private Boolean isRead;
 
     public Message() {
@@ -31,5 +38,10 @@ public class Message {
         this.time = time;
         this.filename = filename;
         this.isRead = isRead;
+    }
+
+    // Optional method to convert to ZonedDateTime if needed
+    public ZonedDateTime getZonedTime() {
+        return time != null ? time.atZone(java.time.ZoneId.systemDefault()) : null;
     }
 }

@@ -26,11 +26,12 @@ import java.io.File;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api")
 
@@ -103,8 +104,17 @@ public class ChatController {
     @SendTo("/topic/messages")
     public MessageDto handleMessage(@Payload MessageDto messageDto) {
         System.out.println("Received message through WebSocket: " + messageDto.getMessage());
-        Message message = new Message(messageDto.getMessage(), messageDto.getSenderId(), messageDto.getReceiverId(),
-                messageDto.getTime(), messageDto.getFileName(), false);
+        
+        // Convert ZonedDateTime to LocalDateTime for database storage
+        Message message = new Message(
+            messageDto.getMessage(), 
+            messageDto.getSenderId(), 
+            messageDto.getReceiverId(),
+            messageDto.getTime().toLocalDateTime(), 
+            messageDto.getFileName(), 
+            false
+        );
+        
         messageRepository.save(message);
         return messageDto;
     }
