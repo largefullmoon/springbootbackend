@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,17 +111,31 @@ public class ChatController {
 
     @PostMapping("/messages")
     public ResponseEntity<?> sendMessage(@RequestBody MessageDto messageDto) {
-        // Access values using getters
-        LocalDateTime serverTime = LocalDateTime.now();
+        // Use ZonedDateTime.now() with system default zone
+        ZonedDateTime serverTime = ZonedDateTime.now();
         System.out.println("Message: " + messageDto.getMessage());
         System.out.println("Sender ID: " + messageDto.getSenderId());
         System.out.println("Receiver ID: " + messageDto.getReceiverId());
         System.out.println("Time: " + serverTime);
+        System.out.println("UTC Time: " + serverTime.withZoneSameInstant(ZoneOffset.UTC));
         System.out.println("FileName: " + messageDto.getFileName());
-        Message message = new Message(messageDto.getMessage(), messageDto.getSenderId(), messageDto.getReceiverId(),
-                serverTime, messageDto.getFileName(), false);
+        
+        // Convert ZonedDateTime to LocalDateTime for database storage if needed
+        Message message = new Message(
+            messageDto.getMessage(), 
+            messageDto.getSenderId(), 
+            messageDto.getReceiverId(),
+            serverTime.toLocalDateTime(), 
+            messageDto.getFileName(), 
+            false
+        );
+        
         messageRepository.save(message);
-        // Emit socket event to the frontend
+        
+        // Set the time in the DTO to ensure consistent timezone
+        messageDto.setTime(serverTime);
+        
+        // Emit socket event to the frontend with ZonedDateTime
         messagingTemplate.convertAndSend("/topic/messages", messageDto);
         return ResponseEntity.ok("Message sent successfully");
     }

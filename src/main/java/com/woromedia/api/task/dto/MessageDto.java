@@ -1,18 +1,19 @@
 package com.woromedia.api.task.dto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 
 public class MessageDto {
     private String message;
     private Long receiverId;
     private Long senderId;
-    private LocalDateTime time;
+    private ZonedDateTime time;
     private String filename;
 
     public MessageDto() {
     }
 
-    public MessageDto(String message, Long senderId, Long receiverId, LocalDateTime time, String filename) {
+    public MessageDto(String message, Long senderId, Long receiverId, ZonedDateTime time, String filename) {
         this.message = message;
         this.senderId = senderId;
         this.receiverId = receiverId;
@@ -33,7 +34,7 @@ public class MessageDto {
         return senderId;
     }
 
-    public LocalDateTime getTime() {
+    public ZonedDateTime getTime() {
         return time;
     }
 
@@ -54,11 +55,16 @@ public class MessageDto {
         this.senderId = senderId;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(ZonedDateTime time) {
         this.time = time;
     }
 
     public void setFileName(String filename) {
         this.filename = filename;
+    }
+
+    // Optional: Add a method to get UTC time explicitly
+    public ZonedDateTime getUtcTime() {
+        return time.withZoneSameInstant(ZoneOffset.UTC);
     }
 }
